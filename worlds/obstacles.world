@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="obstacles">
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+
+    <!-- Obstacles (cylinders) -->
+    <model name="obs1"><static>true</static><pose>-3 0.3 1.5 0 0 0</pose><link name="l">
+      <collision name="c"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry></collision>
+      <visual name="v"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry>
+      <material><ambient>1 0.4 0 1</ambient><diffuse>1 0.4 0 1</diffuse></material></visual></link></model>
+    <model name="obs2"><static>true</static><pose>0 -1.2 1.5 0 0 0</pose><link name="l">
+      <collision name="c"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry></collision>
+      <visual name="v"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry>
+      <material><ambient>1 0.4 0 1</ambient><diffuse>1 0.4 0 1</diffuse></material></visual></link></model>
+    <model name="obs3"><static>true</static><pose>0.5 2 1.5 0 0 0</pose><link name="l">
+      <collision name="c"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry></collision>
+      <visual name="v"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry>
+      <material><ambient>1 0.4 0 1</ambient><diffuse>1 0.4 0 1</diffuse></material></visual></link></model>
+    <model name="obs4"><static>true</static><pose>4 0.5 1.5 0 0 0</pose><link name="l">
+      <collision name="c"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry></collision>
+      <visual name="v"><geometry><cylinder><radius>0.5</radius><length>3</length></cylinder></geometry>
+      <material><ambient>1 0.4 0 1</ambient><diffuse>1 0.4 0 1</diffuse></material></visual></link></model>
+
+    <!-- Goal marker (point B), no collision -->
+    <model name="goal"><static>true</static><pose>8 0 0.02 0 0 0</pose><link name="l">
+      <visual name="v"><geometry><cylinder><radius>0.6</radius><length>0.04</length></cylinder></geometry>
+      <material><ambient>0 1 0 1</ambient><diffuse>0 1 0 1</diffuse></material></visual></link></model>
+
+    <!-- Drone -->
+    <model name="drone">
+      <pose>-8 0 1.5 0 0 0</pose>
+      <link name="base_link">
+        <gravity>false</gravity>
+        <inertial><mass>1.0</mass>
+          <inertia><ixx>0.01</ixx><iyy>0.01</iyy><izz>0.02</izz><ixy>0</ixy><ixz>0</ixz><iyz>0</iyz></inertia></inertial>
+        <visual name="body"><geometry><box><size>0.25 0.25 0.08</size></box></geometry>
+          <material><ambient>0.1 0.1 0.1 1</ambient><diffuse>0.1 0.1 0.1 1</diffuse></material></visual>
+        <visual name="arm1"><pose>0 0 0 0 0 0.785</pose><geometry><box><size>0.7 0.04 0.03</size></box></geometry></visual>
+        <visual name="arm2"><pose>0 0 0 0 0 -0.785</pose><geometry><box><size>0.7 0.04 0.03</size></box></geometry></visual>
+        <visual name="r1"><pose>0.25 0.25 0.04 0 0 0</pose><geometry><cylinder><radius>0.12</radius><length>0.01</length></cylinder></geometry>
+          <material><ambient>0 0.5 1 1</ambient><diffuse>0 0.5 1 1</diffuse></material></visual>
+        <visual name="r2"><pose>-0.25 0.25 0.04 0 0 0</pose><geometry><cylinder><radius>0.12</radius><length>0.01</length></cylinder></geometry>
+          <material><ambient>0 0.5 1 1</ambient><diffuse>0 0.5 1 1</diffuse></material></visual>
+        <visual name="r3"><pose>0.25 -0.25 0.04 0 0 0</pose><geometry><cylinder><radius>0.12</radius><length>0.01</length></cylinder></geometry>
+          <material><ambient>0 0.5 1 1</ambient><diffuse>0 0.5 1 1</diffuse></material></visual>
+        <visual name="r4"><pose>-0.25 -0.25 0.04 0 0 0</pose><geometry><cylinder><radius>0.12</radius><length>0.01</length></cylinder></geometry>
+          <material><ambient>0 0.5 1 1</ambient><diffuse>0 0.5 1 1</diffuse></material></visual>
+
+        <!-- 2D lidar -->
+        <sensor name="lidar" type="ray">
+          <pose>0 0 0.06 0 0 0</pose>
+          <always_on>true</always_on>
+          <update_rate>10</update_rate>
+          <visualize>true</visualize>
+          <ray>
+            <scan><horizontal><samples>360</samples><resolution>1</resolution>
+              <min_angle>-3.14159</min_angle><max_angle>3.14159</max_angle></horizontal></scan>
+            <range><min>0.2</min><max>6.0</max><resolution>0.01</resolution></range>
+          </ray>
+          <plugin name="lidar_plugin" filename="libgazebo_ros_ray_sensor.so">
+            <ros><namespace>/drone</namespace><remapping>~/out:=scan</remapping></ros>
+            <output_type>sensor_msgs/LaserScan</output_type>
+            <frame_name>base_link</frame_name>
+          </plugin>
+        </sensor>
+      </link>
+
+      <!-- Velocity control (cmd_vel) + odometry -->
+      <plugin name="drone_move" filename="libgazebo_ros_planar_move.so">
+        <ros><namespace>/drone</namespace></ros>
+        <update_rate>50</update_rate>
+        <publish_rate>20</publish_rate>
+        <publish_odom>true</publish_odom>
+        <publish_odom_tf>false</publish_odom_tf>
+        <odometry_frame>odom</odometry_frame>
+        <robot_base_frame>base_link</robot_base_frame>
+      </plugin>
+    </model>
+  </world>
+</sdf>

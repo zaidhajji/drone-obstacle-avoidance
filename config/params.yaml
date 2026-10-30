@@ -1,0 +1,9 @@
+nav_node:
+  ros__parameters:
+    v_max: 1.0          # m/s
+    influence: 1.2      # lidar repulsion distance (m)
+    k_rep: 1.5
+    inflation: 0.8      # safety margin for A* (m)
+    resolution: 0.25    # grid cell size (m)
+    goal_tol: 0.4
+    collision_dist: 0.35
